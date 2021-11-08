@@ -22,7 +22,6 @@ class clsComanda {
     private byte SendCut[]={0x0a,0x0a,0x1d,0x56,0x01};
     private byte SendCash[]={0x1b,0x70,0x00,0x1e,(byte)0xff,0x00};
 
-
     public clsComanda(Context context) {
         cont=context;
     }
@@ -96,7 +95,7 @@ class clsComanda {
                 File file = new File(filename);
                 file.delete();
             } catch (Exception e) {
-                error = "No se logro borrar archivo de impresion. La impresion de va a repetir.";return false;
+                error = "No se logro borrar archivo de impresion. La impresion se va a repetir.";return false;
             }
 
             return true;

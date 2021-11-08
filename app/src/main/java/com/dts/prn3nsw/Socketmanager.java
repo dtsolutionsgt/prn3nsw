@@ -19,7 +19,7 @@ public class Socketmanager {
 	private OutputStream PriOut = null;
 	private boolean iState=false;  
 	
-	public String mstrIp="192.168.1.100";
+	public String mstrIp="";
 	public  int mPort=9100;
 	
 	int TimeOut=1300;

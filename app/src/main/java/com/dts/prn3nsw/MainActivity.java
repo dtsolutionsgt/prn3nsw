@@ -103,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
             if (items.size()>0) {
                 processPrint();
             } else {
-                msgclose("No existen documentos pendientes de impresión");
+                finish();
+                //msgclose("No existen documentos pendientes de impresión");
             }
         } catch (Exception e) {
             toastlong(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
