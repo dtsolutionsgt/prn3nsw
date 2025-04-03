@@ -1,4 +1,4 @@
-package com.dts.prn3nsw;
+package com.dts.prn3nsusb;
 
 import android.content.Context;
 import android.os.Environment;
@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-class clsComanda {
+class clsPrintUSB {
 
     public String tipo,nombre,IP,error;
     public ArrayList<String> lines= new ArrayList<String>();
@@ -22,7 +22,7 @@ class clsComanda {
     private byte SendCut[]={0x0a,0x0a,0x1d,0x56,0x01};
     private byte SendCash[]={0x1b,0x70,0x00,0x1e,(byte)0xff,0x00};
 
-    public clsComanda(Context context) {
+    public clsPrintUSB(Context context) {
         cont=context;
     }
 

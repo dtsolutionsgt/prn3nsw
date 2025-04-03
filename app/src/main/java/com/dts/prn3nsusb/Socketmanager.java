@@ -1,4 +1,4 @@
-package com.dts.prn3nsw;
+package com.dts.prn3nsusb;
 
 import android.content.Context;
 

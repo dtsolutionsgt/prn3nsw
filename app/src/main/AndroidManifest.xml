@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dts.prn3nsw">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.dts.prn3nsusb">
 
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <uses-feature android:name="android.hardware.usb.host" />
+    <uses-sdk
+        android:minSdkVersion="23"
+        android:targetSdkVersion="28" />
 
     <application
         android:allowBackup="true"
@@ -15,15 +18,19 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/tns_icon"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Prn3nsw">
+        android:theme="@style/Theme.Prn3nsw"
+
+        >
         <activity
-            android:name=".MainActivity"
+            android:name="com.dts.prn3nsusb.MainActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
         </activity>
     </application>
 

@@ -6,7 +6,7 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        applicationId "com.dts.prn3nsw"
+        applicationId "com.dts.prn3nsusb"
         minSdkVersion 23
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
@@ -26,6 +26,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    namespace 'com.dts.prn3nsusb'
+
 }
 
 dependencies {
