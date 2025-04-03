@@ -5,7 +5,6 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,7 +15,10 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,13 +30,10 @@ public class MainActivity extends AppCompatActivity {
 
     private UsbAdmin mUsbAdmin=null;
 
-    private Runnable mUpdate;
-    private Handler mHandler;
-
     private ArrayList<String> lines= new ArrayList<String>();
 
-    private String err,ss,ps;
-    private int errcnt,connint;
+    private String ps;
+    private int connint;
     private boolean connected;
 
     private byte SendCut[]={0x0a,0x0a,0x1d,0x56,0x01};
@@ -56,13 +55,7 @@ public class MainActivity extends AppCompatActivity {
             mUsbAdmin=new UsbAdmin(this);
 
             Handler mtimer = new Handler();
-            Runnable mrunner=new Runnable() {
-                @Override
-                public void run() {
-                    intentaConexion();
-                    //procesaArchivo();
-                }
-            };
+            Runnable mrunner= () -> intentaConexion();
             mtimer.postDelayed(mrunner,500);
 
         } catch (Exception e) {
@@ -83,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void doTest(View view) {
         intentaConexion();
-        //procesaArchivo();
     }
 
     //endregion
@@ -100,19 +92,16 @@ public class MainActivity extends AppCompatActivity {
     private void connectaUSB() {
         try {
             Handler mtimer = new Handler();
-            Runnable mrunner=new Runnable() {
-                @Override
-                public void run() {
-                    if (connint<10) {
-                        validaConexion();
-                        if (connected) {
-                            imprimeDocumento();
-                        } else {
-                            connectaUSB();
-                        }
+            Runnable mrunner= () -> {
+                if (connint<10) {
+                    validaConexion();
+                    if (connected) {
+                        imprimeDocumento();
                     } else {
-                        sinConexion();
+                        connectaUSB();
                     }
+                } else {
+                    sinConexion();
                 }
             };
             mtimer.postDelayed(mrunner,500);
@@ -133,12 +122,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void imprimeDocumento() {
         try {
-            ps="123456";
-
-            ps+="\n\n\n\n"+((char) SendCut[0])+((char) SendCut[1])+((char) SendCut[2])+((char) SendCut[3])+((char) SendCut[4]);
-            PrintfData(ps.getBytes("GBK"));
-
-            closeSession();
+            if (cargaArchivo()) {
+                ps+="\n\n\n\n"+((char) SendCut[0])+((char) SendCut[1])+((char) SendCut[2])+((char) SendCut[3])+((char) SendCut[4]);
+                PrintfData(ps.getBytes("GBK"));
+                PrintfData(SendCash);
+                closeSession();
+            } else {
+                msgclose("Archivo de impresión no existe.");
+            }
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
@@ -147,139 +138,6 @@ public class MainActivity extends AppCompatActivity {
     //endregion
 
     //region Main
-
-    private void procesaArchivo() {
-        String fname,sn="",path;
-        ArrayList<String> names= new ArrayList<String>();
-
-        path = Environment.getExternalStorageDirectory().toString();
-        items.clear();
-
-        try {
-            File directory = new File(path);
-            File[] files = directory.listFiles();
-
-            for (int i = 0; i < files.length; i++) {
-                fname=files[i].getName();
-                if (fname.indexOf("print")==0) {
-                    if (fname.indexOf(".txt")>=0) {
-
-                        cargaArchivo();
-
-                        /*
-                        item=new clsComanda(MainActivity.this);
-
-                        if (item.cargar(fname)) {
-                            items.add(item);
-                        } else {
-                            msgclose("No se puede leer archivo de impresión.");return;
-                        }
-                        */
-                    }
-                }
-            }
-
-            //if (items.size()>0) {
-                processPrint();
-            /*
-            } else {
-                toastlong("No existen documentos pendientes de impresión");
-                finish();
-            }
-
-             */
-        } catch (Exception e) {
-            toastlong(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-        }
-    }
-
-    private void processPrint() {
-        try {
-
-            if (!conTest()) {
-                msgclose("No se puede conectar a la impresora.");return;
-            }
-
-            err="";errcnt=0;
-            for (int i = 0; i < items.size(); i++) {
-
-                item=items.get(i);
-
-                if (!item.print()) {
-                    err=item.error;errcnt++;
-                }
-
-                try {
-                    Thread.sleep(500);
-                } catch (Exception ee) {}
-            }
-
-            if (errcnt==0) {
-                toast("Impresion completa");finish();
-            } else {
-                ss="Ocurrio un error :\n"+err;
-                msgclose(ss);
-            }
-        } catch (Exception e) {
-            msgclose(e.getMessage());
-        }
-    }
-
-    private void cargaArchivo() {
-        try {
-            lines.clear();
-            lines.add("1234567890");
-            lines.add("1234567890");
-            lines.add("1234567890");
-            lines.add("");
-            lines.add("");
-            lines.add("");
-
-            ps="";
-            for (int i = 0; i <lines.size(); i++) {
-                ps+=lines.get(i)+"\n";
-            }
-
-            procesaImpresion();
-
-        } catch (Exception e) {
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-        }
-    }
-
-    private void procesaImpresion() {
-        toast("print 1");
-        if (imprimeArchivo()) {
-            finish();
-        } else {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
-            toast("print 2");
-
-            if (imprimeArchivo()) {
-                finish();
-            } else {
-                msgclose(err);
-            }
-        }
-    }
-
-    private boolean imprimeArchivo() {
-        try {
-            if (conTest()) {
-                PrintfData(ps.getBytes("GBK"));
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            err=e.getMessage();return false;
-        }
-    }
 
     private void closeSession() {
         try {
@@ -343,10 +201,7 @@ public class MainActivity extends AppCompatActivity {
             dialog.setTitle("Impresion 3nStar");
             dialog.setMessage(msg);
             dialog.setCancelable(false);
-
-            dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {}
-            });
+            dialog.setNeutralButton("OK", (dialog1, which) -> {});
             dialog.show();
 
         } catch (Exception ex) {
@@ -358,16 +213,10 @@ public class MainActivity extends AppCompatActivity {
         try {
 
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
             dialog.setTitle("Impresion 3nStar USB");
             dialog.setMessage(msg);
             dialog.setCancelable(false);
-
-            dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    closeSession();
-                }
-            });
+            dialog.setNeutralButton("OK", (dialog1, which) -> closeSession());
             dialog.show();
 
         } catch (Exception ex) {
@@ -411,30 +260,6 @@ public class MainActivity extends AppCompatActivity {
 
     //endregion
 
-    private void openUSB2() {
-        String ss;
-
-        try {
-            if (conTest()) {
-                toast("USB Opened");
-
-                Handler mtimer = new Handler();
-                Runnable mrunner=new Runnable() {
-                    @Override
-                    public void run() {
-                        //PrintfData(SendCut);
-                    }
-                };
-                mtimer.postDelayed(mrunner,200);
-
-            } else {
-                toast("Not open");
-            }
-        } catch (Exception e) {
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-        }
-    }
-
     private void openUSB() {
         String ss;
 
@@ -445,12 +270,7 @@ public class MainActivity extends AppCompatActivity {
                 PrintfData(ss.getBytes("GBK"));
 
                 Handler mtimer = new Handler();
-                Runnable mrunner=new Runnable() {
-                    @Override
-                    public void run() {
-                        PrintfData(SendCut);
-                    }
-                };
+                Runnable mrunner= () -> PrintfData(SendCut);
                 mtimer.postDelayed(mrunner,200);
 
             } else {
@@ -461,7 +281,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    boolean cargaArchivo() {
+        BufferedReader br=null;
+        FileReader fr;
+        String line;
 
+        lines.clear();
 
+        try {
+            String filename=Environment.getExternalStorageDirectory().toString()+"/print.txt";
+            File file = new File(filename);
 
+            fr=new FileReader(file);
+            br = new BufferedReader(fr);
+
+            lines.clear();
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+
+            fr.close();
+            br.close();
+
+            ps="";
+            for (int i = 0; i <lines.size(); i++) {
+                ps+=lines.get(i)+"\n";
+            }
+
+            return true;
+        } catch (Exception e) {
+            try {
+                br.close();
+            } catch (IOException ee) {}
+            return false;
+        }
+    }
 }
