@@ -4,11 +4,14 @@ package com.dts.prn3nsw;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -45,6 +48,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void startApplication() {
         try {
+
+            if (Build.VERSION.SDK_INT >= 30) {
+                if (!Environment.isExternalStorageManager()) {
+                    grandAllFilesAccess();
+                    exitApp();return;
+                }
+            }
+
 
             rel1 = findViewById(R.id.relProgress);
 
@@ -84,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             File directory = new File(path);
             File[] files = directory.listFiles();
+
+            int nn=files.length;
+            nn=nn+0;
 
             for (int i = 0; i < files.length; i++) {
                 fname=files[i].getName();
@@ -140,6 +154,25 @@ public class MainActivity extends AppCompatActivity {
     //endregion
 
     //region Aux
+
+    private void grandAllFilesAccess() {
+        try {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+        } catch (Exception e) {
+            msgclose(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+    }
+
+    private void exitApp() {
+        Handler mtimer = new Handler();
+        Runnable mrunner= () -> {
+            finish();
+        };
+        mtimer.postDelayed(mrunner,200);
+
+    }
 
     private void toast(String msg) {
         Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_SHORT);
