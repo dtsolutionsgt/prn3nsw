@@ -1,36 +1,30 @@
 package com.dts.prn3nsw;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private RelativeLayout rel1;
 
-    private  ArrayList<clsComanda> items= new ArrayList<clsComanda>();
+    private ArrayList<clsComanda> items= new ArrayList<clsComanda>();
     private clsComanda item;
 
     private Socketmanager mSockManager;
@@ -45,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        grantPermissions();
+        //grantPermissions();
+        startApplication();
     }
 
     private void startApplication() {
@@ -103,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
             if (items.size()>0) {
                 processPrint();
             } else {
+                toastlong("No existen documentos pendientes de impresión");
                 finish();
-                //msgclose("No existen documentos pendientes de impresión");
             }
         } catch (Exception e) {
             toastlong(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());

@@ -5,6 +5,9 @@ plugins {
 android {
     compileSdkVersion 28
 
+    namespace 'com.dts.prn3nsw'
+
+
     defaultConfig {
         applicationId "com.dts.prn3nsw"
         minSdkVersion 23
