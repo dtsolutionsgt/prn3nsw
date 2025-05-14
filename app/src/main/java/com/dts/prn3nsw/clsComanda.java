@@ -87,6 +87,11 @@ class clsComanda {
                 ps+=lines.get(i)+"\n";
             }
 
+            ps=ps+"--     \n";
+            ps=ps+"       \n";
+            ps=ps+"       \n";
+            ps=ps+="      \n";
+
             ps=ps+((char) SendCut[0])+((char) SendCut[1])+((char) SendCut[2])+((char) SendCut[3])+((char) SendCut[4]);
 
             printData(ps.getBytes("GBK"));
